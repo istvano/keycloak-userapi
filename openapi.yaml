@@ -1,0 +1,214 @@
+openapi: 3.0.0
+info:
+  title: Keycloak Remote User API
+  description: This is a sample user server.
+  license:
+    name: Apache-2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.0
+tags:
+- name: user
+  description: Operations about user
+paths:
+  /user/{userId}:
+    get:
+      tags:
+      - user
+      summary: Get user by user name
+      operationId: getUserByName
+      parameters:
+      - name: userId
+        in: path
+        description: The ID that needs to be fetched.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+      responses:
+        200:
+          description: OK - successful operation
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/User'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+              example:
+                id: 'c9f68d07-e7e1-4b3a-9821-2beab218d180'
+                username: 'testuser'
+                firstName: 'Test'
+                lastName: 'User'
+                email: 'test@example.org'
+                phone: 'Phone number'
+                userStatus: 1
+        400:
+          description: >
+            Bad Request - A request was made which is in error, such as an
+            invalid property value
+              * Any basic validation failures or business rule failures, for example, user does not exist for whom credential update is requested
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              example:
+                title: 'Invalid property value of name'
+                detail: 'Unable to find a property value superstar'
+                status: 400
+        401:
+          description: |
+            Unauthorized - A request was made with invalid authentication
+              * Missing Auth header
+              * Incorrect Auth header value in a valid format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              example:
+                title: 'Unauthorized request'
+                detail: 'Incorrect header format'
+                status: 401
+        405:
+          description: Method Not Acceptable - An HTTP method was used which is not supported
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              example:
+                title: 'Method Not Acceptable'
+                detail: 'PATCH is not acceptable'
+                status: 405
+        406:
+          description: Not Acceptable - The client presented a content type in the Accept header which is not supported by API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              example:
+                title: 'Not Acceptable'
+                detail: 'YAML format is not acceptable'
+                status: 406
+        415:
+          description: Unsupported Media Type - A media type was used which is not supported
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        500:
+          description: Internal Server Error - Something went unexpectedly wrong within the service while executing the request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              example:
+                title: 'Internal Server Error'
+                detail: 'Request could not be processed'
+                status: 500
+      x-accepts: application/json
+      x-tags:
+      - tag: user
+components:
+  schemas:
+    User:
+      title: a User
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        username:
+          type: string
+          x-faker: internet.userName
+        firstName:
+          type: string
+          x-faker: name.firstName
+        lastName:
+          type: string
+          x-faker: name.lastName
+        email:
+          type: string
+          x-faker: internet.email
+        phone:
+          type: string
+          x-faker: phone.phoneNumber
+        userStatus:
+          type: integer
+          description: User Status
+          minimum: 0
+          maximum: 1
+      description: A User who is purchasing from the pet store
+      example:
+        firstName: George
+        lastName: Newman
+        userStatus: 1
+        phone: '01342 450950'
+        id: 'c9f68d07-e7e1-4b3a-9821-2beab218d180'
+        email: 'george32@example.com'
+        username: 'george32'
+      xml:
+        name: User
+    Problem:
+      type: object
+      description: Problem entity describing an issue that happened during an operation
+      properties:
+        type:
+          type: string
+          description: a URL to a document describing the error condition (optional, and
+            'about:blank' is assumed if none is provided; should resolve to a
+            human-readable document)
+        title:
+          type: string
+          description: A short, human-readable title for the general error type; the title
+            should not change for given types
+        detail:
+          type: string
+          description: A human-readable description of the specific error.
+        status:
+          type: integer
+          description: Conveying the HTTP status code; this is so that all information is
+            in one place, but also to correct for changes in the status code due
+            to the usage of proxy servers. The status member, if present, is
+            only advisory as generators MUST use the same status code in the
+            actual HTTP response to assure that generic HTTP software that does
+            not understand this format still behaves correctly.
+        instance:
+          type: string
+          description: This optional key may be present, with a unique URI for the specific
+            error; this will often point to an error log for that specific
+            response. (e.g. correlation-id in remote logging system
+      example:
+        type: https://example.org/incorrect-password-rule
+        title: Requested entity is not found.
+        detail: Unable to find the requested entity in the database
+        status: 404
+        instance: ""
+    Success:
+      type: object
+      description: Entity describing the result of the action in case it was a request that
+        does not output the entity it dealt with
+      properties:
+        title:
+          type: string
+          description: The high level description
+        detail:
+          type: string
+          description: Detail of the operation
+        status:
+          type: integer
+          description: status code
+      example:
+        status: 200
+        detail: "Credentials have been updated"
+        title: "Operation executed successfully."
+  requestBodies:
+    UserArray:
+      description: List of user object
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/User'
+      required: true
