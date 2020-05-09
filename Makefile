@@ -8,7 +8,7 @@ SWAGGER_UI_NAME=swagger-ui
 MOCK_NAME=mock-server
 MOCK_PORT=4010
 
-API_DEF_PATH=${PWD}
+API_DEF_PATH=${PWD}/rest-api-schema/src/main/resources
 API_DEF_FILE=openapi.yaml
 
 ## -- HELP --

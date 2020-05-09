@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>uk.co.urbanandco.keycloak</groupId>
+    <artifactId>rest-user-storage-provider</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>ear-module</module>
+        <module>jar-module</module>
+        <module>rest-api-module</module>
+        <module>rest-api-schema</module>
+    </modules>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+
+        <lombok.version>1.18.12</lombok.version>
+        <jboss-logging.version>3.3.1.Final</jboss-logging.version>
+        <keycloak.version>10.0.1</keycloak.version>
+        <auto-service.version>1.0-rc5</auto-service.version>
+        <jboss.home>target/keycloak</jboss.home>
+
+        <openapi.codegen.version>5.0.0-SNAPSHOT</openapi.codegen.version>
+
+        <!-- open api -->
+        <swagger-annotations-version>1.5.24</swagger-annotations-version>
+        <feign-version>11.0</feign-version>
+        <feign-form-version>3.8.0</feign-form-version>
+        <jackson-version>2.10.3</jackson-version>
+        <jackson-databind-nullable-version>0.2.1</jackson-databind-nullable-version>
+        <jackson-databind-version>2.10.3</jackson-databind-version>
+        <junit-version>4.13</junit-version>
+        <maven-plugin-version>1.0.0</maven-plugin-version>
+        <oltu-version>1.0.1</oltu-version>
+
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.google.auto.service</groupId>
+                <artifactId>auto-service</artifactId>
+                <version>${auto-service.version}</version>
+                <scope>provided</scope>
+                <optional>true</optional>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-ear-plugin</artifactId>
+                <version>3.0.2</version>
+                <configuration>
+                    <version>7</version>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.wildfly.plugins</groupId>
+                <artifactId>wildfly-maven-plugin</artifactId>
+                <version>2.0.2.Final</version>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
