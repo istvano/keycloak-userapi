@@ -1,5 +1,6 @@
 package uk.co.urbanandco.keycloak.storage.user;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -7,31 +8,64 @@ import org.keycloak.credential.CredentialInput;
 import org.keycloak.credential.CredentialInputUpdater;
 import org.keycloak.credential.CredentialInputValidator;
 import org.keycloak.models.GroupModel;
+import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
+import org.keycloak.models.credential.PasswordCredentialModel;
 import org.keycloak.storage.UserStorageProvider;
+import org.keycloak.storage.UserStorageProviderModel;
 import org.keycloak.storage.user.UserLookupProvider;
 import org.keycloak.storage.user.UserQueryProvider;
 import lombok.extern.jbosslog.JBossLog;
+import uk.co.urbanandco.keycloak.service.CredentialService;
+import uk.co.urbanandco.keycloak.service.UserRepository;
 
 @JBossLog
 public class RestUserStorageProvider implements UserStorageProvider,
     UserLookupProvider, UserQueryProvider, CredentialInputUpdater, CredentialInputValidator {
 
+  protected static final Set<String> supportedCredentialTypes = new HashSet<>();
+
+  private final UserStorageProviderModel config;
+  private final KeycloakSession session;
+  private final UserRepository repository;
+  private final CredentialService credentialService;
+
+  static {
+    supportedCredentialTypes.add(PasswordCredentialModel.TYPE);
+  }
+
+  public RestUserStorageProvider(KeycloakSession session, UserStorageProviderModel config, UserRepository repository, CredentialService credentialService){
+    this.session = session;
+    this.config = config;
+    this.repository = repository;
+    this.credentialService = credentialService;
+  }
+
+
   @Override
-  public boolean supportsCredentialType(String s) {
-    return false;
+  public boolean supportsCredentialType(String credentialType) {
+    return supportedCredentialTypes.contains(credentialType);
   }
 
   @Override
-  public boolean isConfiguredFor(RealmModel realmModel, UserModel userModel, String s) {
-    return false;
+  public boolean isConfiguredFor(RealmModel realmModel, UserModel userModel, String credentialType) {
+    return !supportsCredentialType(credentialType);
   }
 
   @Override
   public boolean isValid(RealmModel realmModel, UserModel userModel,
       CredentialInput credentialInput) {
-    return false;
+    if (userModel == null) {
+      log.warn("Unable to check the credentials of a non existent user");
+      return false;
+    }
+    if (!supportsCredentialType(credentialInput.getType())) {
+      log.warn("Invalid credential type");
+      return false;
+    }
+
+    return credentialService.isCredentialValid(session, config, realmModel, userModel, credentialInput);
   }
 
   @Override
@@ -56,17 +90,17 @@ public class RestUserStorageProvider implements UserStorageProvider,
   }
 
   @Override
-  public UserModel getUserById(String s, RealmModel realmModel) {
+  public UserModel getUserById(String userId, RealmModel realmModel) {
     return null;
   }
 
   @Override
-  public UserModel getUserByUsername(String s, RealmModel realmModel) {
-    return null;
+  public UserModel getUserByUsername(String userName, RealmModel realmModel) {
+    return repository.find(session, config, realmModel, userName);
   }
 
   @Override
-  public UserModel getUserByEmail(String s, RealmModel realmModel) {
+  public UserModel getUserByEmail(String email, RealmModel realmModel) {
     return null;
   }
 

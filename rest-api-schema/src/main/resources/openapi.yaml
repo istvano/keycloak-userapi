@@ -6,26 +6,27 @@ info:
     name: Apache-2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
   version: 1.0.0
+servers:
+  - url: http://localhost:4010
 tags:
 - name: user
   description: Operations about user
 paths:
-  /user/{userId}:
-    get:
+  /users/get:
+    post:
       tags:
       - user
-      summary: Get user by user name
-      operationId: getUserByName
-      parameters:
-      - name: userId
-        in: path
-        description: The ID that needs to be fetched.
+      summary: Get user by username
+      operationId: getUserByUsername
+      requestBody:
+        description: singe user to look up
         required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-          format: uuid
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserNameLookup'
+            example:
+              username: 'alice'
       responses:
         200:
           description: OK - successful operation
@@ -106,9 +107,192 @@ paths:
                 title: 'Internal Server Error'
                 detail: 'Request could not be processed'
                 status: 500
-      x-accepts: application/json
+        x-tags:
+          - tag: user
+  /users/{userId}:
+    get:
+      tags:
+        - user
+      summary: Get user by user's unique identifier
+      operationId: getUserById
+      parameters:
+        - name: userId
+          in: path
+          description: The ID that needs to be fetched.
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            format: uuid
+      responses:
+        200:
+          description: OK - successful operation
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/User'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+              example:
+                id: 'c9f68d07-e7e1-4b3a-9821-2beab218d180'
+                username: 'testuser'
+                firstName: 'Test'
+                lastName: 'User'
+                email: 'test@example.org'
+                phone: 'Phone number'
+                userStatus: 1
+        400:
+          description: >
+            Bad Request - A request was made which is in error, such as an
+            invalid property value
+              * Any basic validation failures or business rule failures, for example, user does not exist for whom credential update is requested
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              example:
+                title: 'Invalid property value of name'
+                detail: 'Unable to find a property value superstar'
+                status: 400
+        401:
+          description: |
+            Unauthorized - A request was made with invalid authentication
+              * Missing Auth header
+              * Incorrect Auth header value in a valid format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              example:
+                title: 'Unauthorized request'
+                detail: 'Incorrect header format'
+                status: 401
+        405:
+          description: Method Not Acceptable - An HTTP method was used which is not supported
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              example:
+                title: 'Method Not Acceptable'
+                detail: 'PATCH is not acceptable'
+                status: 405
+        406:
+          description: Not Acceptable - The client presented a content type in the Accept header which is not supported by API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              example:
+                title: 'Not Acceptable'
+                detail: 'YAML format is not acceptable'
+                status: 406
+        415:
+          description: Unsupported Media Type - A media type was used which is not supported
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        500:
+          description: Internal Server Error - Something went unexpectedly wrong within the service while executing the request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              example:
+                title: 'Internal Server Error'
+                detail: 'Request could not be processed'
+                status: 500
       x-tags:
-      - tag: user
+        - tag: user
+  /users/{userId}/credential:
+    post:
+      tags:
+        - user
+        - credential
+      summary: validate credential of a given user
+      operationId: validateUserCredential
+      parameters:
+        - name: userId
+          in: path
+          description: The ID that needs to be fetched.
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        description: single user credential
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Credential'
+      responses:
+        200:
+          description: OK - successful operation
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Success'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+              example:
+                status: 200
+                detail: "Credentials are valid"
+                title: "Operation executed successfully."
+        400:
+          description: Bad Request - A request was made with invalid token information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              example:
+                title: 'Invalid user credential'
+                detail: 'The credential provided does not match the credential of the user'
+                status: 400
+        405:
+          description: Method Not Acceptable - An HTTP method was used which is not supported
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              example:
+                title: 'Method Not Acceptable'
+                detail: 'PATCH is not acceptable'
+                status: 405
+        406:
+          description: Not Acceptable - The client presented a content type in the Accept header which is not supported by API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              example:
+                title: 'Not Acceptable'
+                detail: 'YAML format is not acceptable'
+                status: 406
+        415:
+          description: Unsupported Media Type - A media type was used which is not supported
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        500:
+          description: Internal Server Error - Something went unexpectedly wrong within the service while executing the request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              example:
+                title: 'Internal Server Error'
+                detail: 'Request could not be processed'
+                status: 500
+        x-tags:
+          - tag: user
 components:
   schemas:
     User:
@@ -140,8 +324,8 @@ components:
           maximum: 1
       description: A User who is purchasing from the pet store
       example:
-        firstName: George
-        lastName: Newman
+        firstName: 'George'
+        lastName: 'Newman'
         userStatus: 1
         phone: '01342 450950'
         id: 'c9f68d07-e7e1-4b3a-9821-2beab218d180'
@@ -149,6 +333,28 @@ components:
         username: 'george32'
       xml:
         name: User
+    UserNameLookup:
+      type: object
+      description: a GET request masquarading as POST as userName might be sensitive and PII data
+      properties:
+        username:
+          type: string
+          description: username of the user we are trying to find
+      example:
+        username: 'alice'
+    Credential:
+      type: object
+      description: a GET request masquarading as POST as userName might be sensitive and PII data
+      properties:
+        type:
+          type: string
+          description: type of the credential e.g. password or token etc
+        credential:
+          type: string
+          description: the credential itself as string
+      example:
+        type: 'password'
+        credential: 'mysecret'
     Problem:
       type: object
       description: Problem entity describing an issue that happened during an operation
@@ -180,10 +386,10 @@ components:
             response. (e.g. correlation-id in remote logging system
       example:
         type: https://example.org/incorrect-password-rule
-        title: Requested entity is not found.
-        detail: Unable to find the requested entity in the database
+        title: 'Requested entity is not found.'
+        detail: 'Unable to find the requested entity in the database'
         status: 404
-        instance: ""
+        instance: ''
     Success:
       type: object
       description: Entity describing the result of the action in case it was a request that

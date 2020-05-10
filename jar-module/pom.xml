@@ -27,6 +27,13 @@
     </dependency>
 
     <dependency>
+      <groupId>org.keycloak</groupId>
+      <artifactId>keycloak-server-spi-private</artifactId>
+      <version>${keycloak.version}</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
       <groupId>org.jboss.logging</groupId>
       <artifactId>jboss-logging</artifactId>
       <version>${jboss-logging.version}</version>
@@ -38,6 +45,12 @@
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
       <version>21.0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>rest-api-module</artifactId>
+      <version>${project.parent.version}</version>
     </dependency>
     <!-- will be added automatically to application.xml -->
 
