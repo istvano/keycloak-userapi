@@ -1,0 +1,6 @@
+echo using ${env.JBOSS_HOME}/standalone/configuration/standalone-ha.xml
+echo SETUP: Begin Keycloak logging configuration for HA...
+embed-server --std-out=echo --server-config=standalone-ha.xml --admin-only
+/subsystem=logging/logger=uk.co.urbanandco.keycloak:add(category=uk.co.urbanandco.keycloak, use-parent-handlers=true, level=DEBUG)
+stop-embedded-server
+echo SETUP: END Keycloak logging configuration...

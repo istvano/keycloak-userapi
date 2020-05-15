@@ -1,5 +1,6 @@
 package uk.co.urbanandco.keycloak.storage.user;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -12,6 +13,7 @@ import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
 import org.keycloak.models.credential.PasswordCredentialModel;
+import org.keycloak.storage.StorageId;
 import org.keycloak.storage.UserStorageProvider;
 import org.keycloak.storage.UserStorageProviderModel;
 import org.keycloak.storage.user.UserLookupProvider;
@@ -81,7 +83,7 @@ public class RestUserStorageProvider implements UserStorageProvider,
 
   @Override
   public Set<String> getDisableableCredentialTypes(RealmModel realmModel, UserModel userModel) {
-    return null;
+    return (Set<String>) Collections.EMPTY_SET;
   }
 
   @Override
@@ -91,7 +93,9 @@ public class RestUserStorageProvider implements UserStorageProvider,
 
   @Override
   public UserModel getUserById(String userId, RealmModel realmModel) {
-    return null;
+    StorageId id = new StorageId(userId);
+    String userName = id.getExternalId();
+    return getUserByUsername(userName, realmModel);
   }
 
   @Override

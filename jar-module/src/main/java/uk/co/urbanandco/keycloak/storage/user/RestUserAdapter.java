@@ -1,26 +1,54 @@
 package uk.co.urbanandco.keycloak.storage.user;
 
+import java.util.Objects;
 import org.keycloak.component.ComponentModel;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
-import org.keycloak.storage.adapter.AbstractUserAdapter;
+import org.keycloak.storage.StorageId;
+import org.keycloak.storage.adapter.InMemoryUserAdapter;
 import uk.co.urbanandco.keycloak.sdk.model.User;
 
-public class RestUserAdapter extends AbstractUserAdapter {
+public class RestUserAdapter extends InMemoryUserAdapter {
 
+  public static final String REMOTE_ID = "remoteId";
   private final User user;
 
   public RestUserAdapter(KeycloakSession session,
       RealmModel realm,
       ComponentModel storageProviderModel,
       User user) {
-    super(session, realm, storageProviderModel);
+
+    super(session, realm, new StorageId(storageProviderModel.getId(), user.getUsername()).getId());
+
+    setSingleAttribute(REMOTE_ID, user.getId().toString());
+    setFirstName(user.getFirstName());
+    setLastName(user.getLastName());
+    setEmail(user.getEmail());
+    setEnabled(true);
+    setEmailVerified(true);
+    addDefaults();
+
     this.user = user;
   }
 
   @Override
-  public String getUsername() {
-    return user.getUsername();
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    if (!super.equals(o)) {
+      return false;
+    }
+    RestUserAdapter that = (RestUserAdapter) o;
+    return Objects.equals(user, that.user);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(super.hashCode(), user);
   }
 
   public static Builder builder() {
