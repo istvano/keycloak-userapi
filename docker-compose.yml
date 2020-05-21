@@ -1,0 +1,84 @@
+version: '3'
+
+volumes:
+  mysql_data:
+    driver: local
+
+services:
+  traefik:
+    image: library/traefik:alpine
+    container_name: traefik
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: >
+      --logLevel=ERROR
+      --api.dashboard
+      --docker
+      --entrypoints="Name:http Address::80"
+      --defaultentrypoints="http"
+    ports:
+      - 80:80
+      - 3000:8080
+  
+  db:
+      image: mariadb
+      volumes:
+        - mysql_data:/var/lib/mysql
+      environment:
+        MYSQL_ROOT_PASSWORD: root
+        MYSQL_DATABASE: keycloak
+        MYSQL_USER: keycloak
+        MYSQL_PASSWORD: password
+      # Copy-pasted from https://github.com/docker-library/mariadb/issues/94
+      healthcheck:
+        test: ["CMD", "mysqladmin", "ping", "--silent"]
+
+  restapi:
+    image: stoplight/prism:3
+    command: >
+      mock -d -h 0.0.0.0 /tmp/openapi.yaml
+    volumes:
+      - ./rest-api-schema/src/main/resources/openapi.yaml:/tmp/openapi.yaml
+    ports:
+      - 4010:4010
+
+  keycloak:
+    image: urbanandco/keycloak-training:10.0.0
+    environment:
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PASSWORD: admin
+      KEYCLOAK_STATISTICS: all
+      KEYCLOAK_LOGLEVEL: DEBUG
+      JAVA_OPTS: -agentlib:jdwp=transport=dt_socket,server=y,address=*:5005,suspend=n    
+      DB_VENDOR: mariadb
+      DB_ADDR: mariadb
+      DB_DATABASE: keycloak
+      DB_USER: keycloak
+      DB_PASSWORD: password
+      JGROUPS_DISCOVERY_PROTOCOL: JDBC_PING
+      JGROUPS_DISCOVERY_PROPERTIES: datasource_jndi_name=java:jboss/datasources/KeycloakDS,info_writer_sleep_time=500,initialize_sql="CREATE TABLE IF NOT EXISTS JGROUPSPING ( own_addr varchar(200) NOT NULL, cluster_name varchar(200) NOT NULL, created timestamp default current_timestamp, ping_data BYTEA, constraint PK_JGROUPSPING PRIMARY KEY (own_addr, cluster_name))"
+    volumes:
+      - ./src/main/resources/demo-realm.json:/tmp/demo-realm.json
+      - ./src/main/resources/cli:/opt/jboss/startup-scripts
+    ports:
+      - 9990:9990
+      - 5005:5005
+      - 8080:8080
+    depends_on:
+      - db
+      - smtp
+      - restapi
+    labels:
+      traefik.enable: true
+      traefik.port: 8080
+      traefik.protocol: http
+      traefik.frontend.rule: Host:localhost
+      traefik.frontend.passHostHeader: true
+      # traefik.backend.loadbalancer.stickiness: true
+
+  smtp:
+    container_name: smtp
+    image: djfarrelly/maildev:1.1.0
+    ports:
+    - "8081:80"
+    - "25"

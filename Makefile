@@ -1,16 +1,5 @@
 .DEFAULT_GOAL := help
 
-SWAGGER_EDITOR_PORT=80
-MOCK_NAME=restapi
-MOCK_PORT=4010
-KEYCLOAK_PORT=8080
-KEYCLOAK_MAN_PORT=9990
-KEYCLOAK_NAME=keycloak-server
-NETWORK_NAME=localhost.com
-
-API_DEF_PATH=${PWD}/rest-api-schema/src/main/resources
-API_DEF_FILE=openapi.yaml
-
 ## -- HELP --
 
 ## This help message
@@ -54,45 +43,38 @@ help:
 ## Start the mock container
 .PHONY: mock
 mock:
-	docker run --rm -it -p ${MOCK_PORT}:4010 \
-	--network ${NETWORK_NAME}	\
-	--name ${MOCK_NAME} \
-	-v ${API_DEF_PATH}/${API_DEF_FILE}:/tmp/${API_DEF_FILE} \
-	stoplight/prism:3 mock -d -h 0.0.0.0 "/tmp/${API_DEF_FILE}"
+	docker-compose -f docker-compose-api.yml up
 
 ## Test the mock service
 .PHONY: test
 test:
 	curl -s http://127.0.0.1:4010/user/c9f68d07-e7e1-4b3a-9821-2beab218d180  -H "accept: application/json" | jq .
 
-
 ## -- Swagger --
 
 ## Start swagger editor to edit swagger definitions locally
 .PHONY: editor
 editor:
-	docker run --rm -p ${SWAGGER_EDITOR_PORT}:8080 swaggerapi/swagger-editor
+	docker-compose -f docker-compose-swagger.yml up
 
-## -- Keycloak --
+## -- Docker --
 
-## Start keycloak server
+## Start full stack with MySql
 .PHONY: up
 up:
-	docker run -it --rm -p ${KEYCLOAK_PORT}:8080 -p ${KEYCLOAK_MAN_PORT}:9990 -p 5005:5005 \
-	--network ${NETWORK_NAME} \
-	--name ${KEYCLOAK_NAME} \
-	-v $(PWD)/src/main/resources/demo-realm.json:/tmp/demo-realm.json \
-  -v $(PWD)/src/main/resources/cli:/opt/jboss/startup-scripts \
-	-e KEYCLOAK_USER=admin -e KEYCLOAK_PASSWORD=admin \
-  -e KEYCLOAK_STATISTICS=all \
-  -e KEYCLOAK_LOGLEVEL=DEBUG \
-  -e JAVA_OPTS=-agentlib:jdwp=transport=dt_socket,server=y,address=*:5005,suspend=n \
-	urbanandco/keycloak-training:10.0.0
+	docker-compose up
+
+## Start Keycloak and the API only
+.PHONY: dev
+dev:
+	docker-compose -f docker-compose-dev.yml up
+
+## -- Development --
 
 ## Create realm into keycloak
-.PHONY: create
-create:
-	docker exec -it ${KEYCLOAK_NAME} \
+.PHONY: create-realm
+create-realm:
+	docker-compose exec keycloak \
 	/opt/jboss/keycloak/bin/kcadm.sh create realms -s enabled=true -f /tmp/demo-realm.json --no-config --server http://localhost:8080/auth --realm master --user admin --password admin
 
 ## Build local project modules
@@ -121,20 +103,16 @@ reload: install-providers re-deploy
 
 ## -- Useful --
 
-.PHONY: log-on
-log-on:
-	@echo "Account url http://localhost:${KEYCLOAK_PORT}/auth/realms/demo/account/"
-
 ## SSH into keycloak container
 .PHONY: ssh
 ssh:
-	docker exec -it ${KEYCLOAK_NAME} bash
+	docker-compose exec keycloak -it bash
 
 ## Show info about the project
 .PHONY: info
 info:
-	@echo "Account url http://localhost:${KEYCLOAK_PORT}/auth/realms/demo/account/"
-	@echo "Account url http://localhost:${KEYCLOAK_PORT}/auth/realms/demo/protocol/openid-connect/logout"
+	@echo "Account url http://localhost/auth/realms/demo/account/"
+	@echo "Account url http://localhost/auth/realms/demo/protocol/openid-connect/logout"
 
 
 

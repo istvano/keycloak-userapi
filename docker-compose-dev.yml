@@ -1,0 +1,33 @@
+version: '3'
+
+volumes:
+  mysql_data:
+    driver: local
+
+services:
+  restapi:
+    image: stoplight/prism:3
+    command: >
+      mock -d -h 0.0.0.0 /tmp/openapi.yaml
+    volumes:
+      - ./rest-api-schema/src/main/resources/openapi.yaml:/tmp/openapi.yaml
+    ports:
+      - 4010:4010
+
+  keycloak:
+    image: urbanandco/keycloak-training:10.0.0
+    environment:
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PASSWORD: admin
+      KEYCLOAK_STATISTICS: all
+      KEYCLOAK_LOGLEVEL: DEBUG
+      JAVA_OPTS: -agentlib:jdwp=transport=dt_socket,server=y,address=*:5005,suspend=n
+    volumes:
+      - ./src/main/resources/demo-realm.json:/tmp/demo-realm.json
+      - ./src/main/resources/cli:/opt/jboss/startup-scripts
+    ports:
+      - 9990:9990
+      - 5005:5005
+      - 8080:8080
+    depends_on:
+      - restapi

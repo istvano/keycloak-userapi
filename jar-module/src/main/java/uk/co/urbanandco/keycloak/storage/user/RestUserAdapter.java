@@ -26,6 +26,7 @@ public class RestUserAdapter extends InMemoryUserAdapter {
     setEmail(user.getEmail());
     setEnabled(true);
     setEmailVerified(true);
+    setUsername(user.getUsername());
     addDefaults();
 
     this.user = user;
