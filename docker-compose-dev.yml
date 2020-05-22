@@ -15,12 +15,14 @@ services:
       - 4010:4010
 
   keycloak:
-    image: urbanandco/keycloak-training:10.0.0
+    image: urbanandco/keycloak-training:10.0.1
     environment:
       KEYCLOAK_USER: admin
       KEYCLOAK_PASSWORD: admin
       KEYCLOAK_STATISTICS: all
-      KEYCLOAK_LOGLEVEL: DEBUG
+      KEYCLOAK_LOGLEVEL: INFO
+      KEYCLOAK_STATIC_MAX_AGE: -1
+      KEYCLOAK_THEME_CACHE: 'false'
       JAVA_OPTS: -agentlib:jdwp=transport=dt_socket,server=y,address=*:5005,suspend=n
     volumes:
       - ./src/main/resources/demo-realm.json:/tmp/demo-realm.json
@@ -31,3 +33,11 @@ services:
       - 8080:8080
     depends_on:
       - restapi
+      - smtp
+
+  smtp:
+    container_name: smtp
+    image: djfarrelly/maildev:1.1.0
+    ports:
+    - "8081:80"
+    - "25"      
