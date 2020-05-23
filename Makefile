@@ -118,6 +118,19 @@ mvn/deploy-providers: mvn/deploy-user-provider mvn/deploy-auth-provider
 debug:
 	docker-compose -f docker-compose-dev.yml up
 
+#
+
+## Get a token
+.PHONY: kc/info
+kc/info:
+	curl -k http://localhost:8080/auth/realms/demo/.well-known/openid-configuration  | jq '.'
+
+## Get a token
+.PHONY: kc/token
+kc/token:
+	curl -k --data "username=user&password=test&grant_type=password&client_id=demo-client&client_secret=8a899f1a-e391-4bbf-b29f-35f103fda84d" http://localhost:8080/auth/realms/demo/protocol/openid-connect/token | jq '.'
+
+
 ## -- Tools --
 
 ## Start swagger editor to edit swagger definitions locally

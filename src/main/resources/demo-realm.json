@@ -2,7 +2,53 @@
   "id": "demo",
   "realm": "demo",
   "enabled": true,
-  "smtpServer": {},
+  "smtpServer": {
+    "host": "smtp",
+    "from": "no-reply@localhost.com",
+    "starttls": "",
+    "auth": "",
+    "ssl": ""
+  },
+  "clients": [
+    {
+      "id": "1ff744f0-b5b2-4e5e-9b81-ded7722c50bc",
+      "clientId": "demo-client",
+      "surrogateAuthRequired": false,
+      "enabled": true,
+      "alwaysDisplayInConsole": false,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "8a899f1a-e391-4bbf-b29f-35f103fda84d",
+      "redirectUris": ["http://localhost"],
+      "webOrigins": [],
+      "notBefore": 0,
+      "bearerOnly": false,
+      "consentRequired": false,
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": true,
+      "serviceAccountsEnabled": false,
+      "publicClient": false,
+      "frontchannelLogout": false,
+      "protocol": "openid-connect",
+      "attributes": {},
+      "authenticationFlowBindingOverrides": {},
+      "fullScopeAllowed": true,
+      "nodeReRegistrationTimeout": -1,
+      "defaultClientScopes": [
+        "web-origins",
+        "role_list",
+        "roles",
+        "profile",
+        "email"
+      ],
+      "optionalClientScopes": [
+        "address",
+        "phone",
+        "offline_access",
+        "microprofile-jwt"
+      ]
+    }
+  ],
   "components": {
     "org.keycloak.services.clientregistration.policy.ClientRegistrationPolicy": [
       {
