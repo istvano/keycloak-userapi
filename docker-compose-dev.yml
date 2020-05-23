@@ -23,6 +23,7 @@ services:
       KEYCLOAK_LOGLEVEL: INFO
       KEYCLOAK_STATIC_MAX_AGE: -1
       KEYCLOAK_THEME_CACHE: 'false'
+      CUSTOM_LOG_LEVEL: DEBUG
       JAVA_OPTS: -agentlib:jdwp=transport=dt_socket,server=y,address=*:5005,suspend=n
     volumes:
       - ./src/main/resources/demo-realm.json:/tmp/demo-realm.json

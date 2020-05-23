@@ -10,6 +10,8 @@ import org.keycloak.models.UserModel;
 @JBossLog
 public class ExternalMfaAuthenticator implements Authenticator {
 
+  public static final String DEFAULT_MFA_ID = "ext-mfa";
+
   @Override
   public void authenticate(AuthenticationFlowContext authenticationFlowContext) {
 
@@ -22,19 +24,19 @@ public class ExternalMfaAuthenticator implements Authenticator {
 
   @Override
   public boolean requiresUser() {
-    return false;
+    return true;
   }
 
   @Override
   public boolean configuredFor(KeycloakSession keycloakSession, RealmModel realmModel,
       UserModel userModel) {
-    return false;
+    return true;
   }
 
   @Override
   public void setRequiredActions(KeycloakSession keycloakSession, RealmModel realmModel,
       UserModel userModel) {
-
+    //Nothing to do
   }
 
   @Override

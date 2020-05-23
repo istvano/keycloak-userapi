@@ -9,14 +9,14 @@ help:
 	@printf "Usage\n";
 
 	@awk '{ \
-			if ($$0 ~ /^.PHONY: [a-zA-Z\-\_0-9]+$$/) { \
+			if ($$0 ~ /^.PHONY: [a-zA-Z\-\/\_0-9]+$$/) { \
 				helpCommand = substr($$0, index($$0, ":") + 2); \
 				if (helpMessage) { \
 					printf "\033[36m%-20s\033[0m %s\n", \
 						helpCommand, helpMessage; \
 					helpMessage = ""; \
 				} \
-			} else if ($$0 ~ /^[a-zA-Z\-\_0-9.]+:/) { \
+			} else if ($$0 ~ /^[a-zA-Z\-\/\_0-9.]+:/) { \
 				helpCommand = substr($$0, 0, index($$0, ":")); \
 				if (helpMessage) { \
 					printf "\033[36m%-20s\033[0m %s\n", \
@@ -41,72 +41,89 @@ help:
 ## -- Mock --
 
 ## Start the mock container
-.PHONY: mock
-mock:
+.PHONY: mock/up
+mock/up:
 	docker-compose -f docker-compose-api.yml up
 
 ## Test the mock service
-.PHONY: test
-test:
+.PHONY: mock/test
+mock/test:
 	curl -s http://127.0.0.1:4010/user/c9f68d07-e7e1-4b3a-9821-2beab218d180  -H "accept: application/json" | jq .
-
-## -- Swagger --
-
-## Start swagger editor to edit swagger definitions locally
-.PHONY: editor
-editor:
-	docker-compose -f docker-compose-swagger.yml up
 
 ## -- Docker --
 
 ## Start full stack with MySql
-.PHONY: up
+.PHONY: stack/up
 up:
 	docker-compose up
 
-## Start Keycloak and the API only
-.PHONY: dev
-dev:
-	docker-compose -f docker-compose-dev.yml up
+## SSH into keycloak container
+.PHONY: stack/ssh-kc
+stack/ssh-kc:
+	docker-compose exec keycloak -it bash
 
 ## -- Development --
 
 ## Create realm into keycloak
-.PHONY: create-realm
-create-realm:
+.PHONY: realm/create
+realm/create:
 	docker-compose exec keycloak \
 	/opt/jboss/keycloak/bin/kcadm.sh create realms -s enabled=true -f /tmp/demo-realm.json --no-config --server http://localhost:8080/auth --realm master --user admin --password admin
 
+## Delete realm into keycloak
+.PHONY: realm/delete
+realm/delete:
+	docker-compose exec keycloak \
+	/opt/jboss/keycloak/bin/kcadm.sh delete realms/demo --no-config --server http://localhost:8080/auth --realm master --user admin --password admin
+
+## Delete realm into keycloak
+.PHONY: realm/reload
+realm/reload: realm/delete realm/create
+
 ## Build local project modules
-.PHONY: install
-install:
+.PHONY: mvn/install
+mvn/install:
 	(mvn clean install -DskipTests)
 
-## Build local keycloak providers only
-.PHONY: install-providers
-install-providers:
-	(cd ./jar-module && mvn clean install -DskipTests)
+## Build user storage providers only
+.PHONY: mvn/install-user-provider
+mvn/install-user-provider:
+	(cd ./user-provider-jar-module && mvn clean install -DskipTests)
 
-## Deploy ear module to keycloak.
-.PHONY: deploy
-deploy: install-providers
-	(cd ./ear-module && mvn clean install -DskipTests wildfly:deploy -Dwildfly.username=keycloak -Dwildfly.password=keycloak)
+## Build authenticator providers only
+.PHONY: mvn/install-auth-provider
+mvn/install-auth-provider:
+	(cd ./authenticator-jar-module && mvn clean install -DskipTests)
 
-## Re-deploy ear module to keycloak.
-.PHONY: re-deploy
-re-deploy:
-	(cd ./ear-module && mvn install -DskipTests wildfly:deploy -Dwildfly.username=keycloak -Dwildfly.password=keycloak)
+## Build all the providers
+.PHONY: mvn/install-providers
+mvn/install-providers: mvn/install-user-provider mvn/install-auth-provider
 
-## Reload already deployed module in keycloak
-.PHONY: reload
-reload: install-providers re-deploy
+## Deploy user storage providers only
+.PHONY: mvn/deploy-user-provider
+mvn/deploy-user-provider:
+	(cd ./user-provider-ear-module && mvn wildfly:deploy -Dwildfly.username=keycloak -Dwildfly.password=keycloak)
 
-## -- Useful --
+## Deploy authenticator providers only
+.PHONY: mvn/deploy-auth-provider
+mvn/deploy-auth-provider:
+	(cd ./authenticator-ear-module && mvn wildfly:deploy -Dwildfly.username=keycloak -Dwildfly.password=keycloak)
 
-## SSH into keycloak container
-.PHONY: ssh
-ssh:
-	docker-compose exec keycloak -it bash
+## Deploy all the providers
+.PHONY: mvn/deploy-providers
+mvn/deploy-providers: mvn/deploy-user-provider mvn/deploy-auth-provider
+
+## Start Keycloak and the API only
+.PHONY: debug
+debug:
+	docker-compose -f docker-compose-dev.yml up
+
+## -- Tools --
+
+## Start swagger editor to edit swagger definitions locally
+.PHONY: api/editor
+api/editor:
+	docker-compose -f docker-compose-swagger.yml up
 
 ## Show info about the project
 .PHONY: info
