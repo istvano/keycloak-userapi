@@ -5,13 +5,15 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>uk.co.urbanandco.keycloak</groupId>
-    <artifactId>rest-user-storage-provider</artifactId>
+    <artifactId>thirdparty-integration</artifactId>
     <version>1.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <modules>
-        <module>ear-module</module>
-        <module>jar-module</module>
+        <module>authenticator-ear-module</module>
+        <module>authenticator-jar-module</module>
+        <module>user-provider-jar-module</module>
+        <module>user-provider-ear-module</module>
         <module>rest-api-module</module>
         <module>rest-api-schema</module>
         <module>assembly</module>

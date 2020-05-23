@@ -4,12 +4,12 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <parent>
     <groupId>uk.co.urbanandco.keycloak</groupId>
-    <artifactId>rest-user-storage-provider</artifactId>
+    <artifactId>thirdparty-integration</artifactId>
     <version>1.0.0-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>rest-user-storage-provider-module</artifactId>
+  <artifactId>external-mfa-authenticator-provider-module</artifactId>
 
   <dependencies>
     <dependency>
@@ -34,6 +34,19 @@
     </dependency>
 
     <dependency>
+      <groupId>org.keycloak</groupId>
+      <artifactId>keycloak-services</artifactId>
+      <version>${keycloak.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>com.google.guava</groupId>
+          <artifactId>guava</artifactId>
+        </exclusion>
+      </exclusions>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
       <groupId>org.jboss.logging</groupId>
       <artifactId>jboss-logging</artifactId>
       <version>${jboss-logging.version}</version>
@@ -47,11 +60,6 @@
       <version>21.0</version>
     </dependency>
 
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>rest-api-module</artifactId>
-      <version>${project.parent.version}</version>
-    </dependency>
     <!-- will be added automatically to application.xml -->
 
     <!-- to generate SPI xml for the keycloak SPI automatically -->
