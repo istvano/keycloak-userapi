@@ -807,7 +807,8 @@
           "autheticatorFlow": false
         },
         {
-          "authenticator": "direct-grant-validate-otp",
+          "authenticatorConfig": "external-mfa-config",
+          "authenticator": "external-mfa-authenticator",
           "requirement": "REQUIRED",
           "priority": 20,
           "userSetupAllowed": false,
@@ -830,11 +831,18 @@
       "config": {
         "update.profile.on.first.login": "missing"
       }
+    },
+    {
+      "id": "75b62681-5473-42d0-850f-33a6b3703fb0",
+      "alias": "external-mfa-config",
+      "config": {
+        "mfa-id": "ext-mfa"
+      }
     }
   ],
   "browserFlow": "browser",
   "registrationFlow": "void",
-  "directGrantFlow": "direct grant",
+  "directGrantFlow": "custom direct grant",
   "resetCredentialsFlow": "void",
   "dockerAuthenticationFlow": "void",
   "keycloakVersion": "10.0.1"

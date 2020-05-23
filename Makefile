@@ -102,12 +102,12 @@ mvn/install-providers: mvn/install-user-provider mvn/install-auth-provider
 ## Deploy user storage providers only
 .PHONY: mvn/deploy-user-provider
 mvn/deploy-user-provider:
-	(cd ./user-provider-ear-module && mvn wildfly:deploy -Dwildfly.username=keycloak -Dwildfly.password=keycloak)
+	(cd ./user-provider-ear-module && mvn clean wildfly:deploy -Dwildfly.username=keycloak -Dwildfly.password=keycloak)
 
 ## Deploy authenticator providers only
 .PHONY: mvn/deploy-auth-provider
 mvn/deploy-auth-provider:
-	(cd ./authenticator-ear-module && mvn wildfly:deploy -Dwildfly.username=keycloak -Dwildfly.password=keycloak)
+	(cd ./authenticator-ear-module && mvn clean wildfly:deploy -Dwildfly.username=keycloak -Dwildfly.password=keycloak)
 
 ## Deploy all the providers
 .PHONY: mvn/deploy-providers
@@ -118,18 +118,15 @@ mvn/deploy-providers: mvn/deploy-user-provider mvn/deploy-auth-provider
 debug:
 	docker-compose -f docker-compose-dev.yml up
 
-#
-
 ## Get a token
 .PHONY: kc/info
 kc/info:
-	curl -k http://localhost:8080/auth/realms/demo/.well-known/openid-configuration  | jq '.'
+	curl -v -k http://localhost:8080/auth/realms/demo/.well-known/openid-configuration  | jq '.'
 
 ## Get a token
 .PHONY: kc/token
 kc/token:
-	curl -k --data "username=user&password=test&grant_type=password&client_id=demo-client&client_secret=8a899f1a-e391-4bbf-b29f-35f103fda84d" http://localhost:8080/auth/realms/demo/protocol/openid-connect/token | jq '.'
-
+	curl -v -k --data "username=user&password=test&grant_type=password&client_id=demo-client&client_secret=8a899f1a-e391-4bbf-b29f-35f103fda84d" http://localhost:8080/auth/realms/demo/protocol/openid-connect/token | jq '.'
 
 ## -- Tools --
 

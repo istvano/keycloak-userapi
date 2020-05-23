@@ -17,6 +17,7 @@
       <groupId>uk.co.urbanandco.keycloak</groupId>
       <artifactId>external-mfa-authenticator-provider-module</artifactId>
       <version>${project.version}</version>
+      <type>ejb</type>
     </dependency>
   </dependencies>
 
@@ -26,7 +27,7 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-ear-plugin</artifactId>
         <configuration>
-          <includeLibInApplicationXml>true</includeLibInApplicationXml>
+          <defaultLibBundleDir>lib</defaultLibBundleDir>
         </configuration>
       </plugin>
 
