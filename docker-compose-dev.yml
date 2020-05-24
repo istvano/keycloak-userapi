@@ -8,7 +8,7 @@ services:
   restapi:
     image: stoplight/prism:3
     command: >
-      mock -d -h 0.0.0.0 /tmp/openapi.yaml
+      mock -h 0.0.0.0 /tmp/openapi.yaml
     volumes:
       - ./rest-api-schema/src/main/resources/openapi.yaml:/tmp/openapi.yaml
     ports:

@@ -1,4 +1,6 @@
-package uk.co.urbanandco.keycloak.actiontoken.authenticator;
+package uk.co.urbanandco.keycloak.authentication.authenticators.directgrant;
+
+import static uk.co.urbanandco.keycloak.authentication.actiontoken.MfaManagerVerifyOtpActionToken.INITIATED_BY_ACTION_TOKEN_EXT_APP;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -11,13 +13,14 @@ import org.keycloak.events.Errors;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
+import org.keycloak.models.credential.OTPCredentialModel;
 import org.keycloak.representations.idm.OAuth2ErrorRepresentation;
 import org.keycloak.sessions.AuthenticationSessionModel;
-import uk.co.urbanandco.keycloak.actiontoken.token.ExternalMfaActionToken;
+import uk.co.urbanandco.keycloak.authentication.actiontoken.MfaManagerSendOtpActionToken;
 import uk.co.urbanandco.keycloak.representations.idm.OAuth2TokenErrorRepresentation;
 
 @JBossLog
-public class ExternalMfaAuthenticator implements Authenticator {
+public class MfaManagerValidateOtpAuthenticator implements Authenticator {
 
   public static final String DEFAULT_MFA_ID = "ext-mfa";
 
@@ -34,12 +37,25 @@ public class ExternalMfaAuthenticator implements Authenticator {
         context.failure(AuthenticationFlowError.INVALID_USER, challengeResponse);
       }
     } else {
-      Response challengeResponse = mfaErrorResponse(Response.Status.FORBIDDEN.getStatusCode(),
-          "mfa_required",
-          "External Multi-factor authentication required",
-          generateMfaToken(context));
-      context.failure(AuthenticationFlowError.CREDENTIAL_SETUP_REQUIRED, challengeResponse);
+
+      String actionTokeFlag = context.getAuthenticationSession().getAuthNote(INITIATED_BY_ACTION_TOKEN_EXT_APP);
+      if (actionTokeFlag != null && Boolean.valueOf(actionTokeFlag) == Boolean.TRUE) {
+        String getOtp = this.getOtp(context);
+        //TODO call api to validate OTP
+        context.success();
+      } else {
+        //TODO call api to send OTP to user
+        Response challengeResponse = mfaErrorResponse(Response.Status.FORBIDDEN.getStatusCode(),
+            "mfa_required",
+            "External Multi-factor authentication required",
+            generateMfaToken(context));
+        context.failure(AuthenticationFlowError.CREDENTIAL_SETUP_REQUIRED, challengeResponse);
+      }
     }
+  }
+
+  public String getOtp(AuthenticationFlowContext context) {
+    return context.getAuthenticationSession().getAuthNote(OTPCredentialModel.TYPE);
   }
 
   public Response errorResponse(int status, String error, String errorDescription) {
@@ -59,7 +75,7 @@ public class ExternalMfaAuthenticator implements Authenticator {
     final AuthenticationSessionModel authSession = context.getAuthenticationSession();
     final String clientId = authSession.getClient().getClientId();
 
-    return new ExternalMfaActionToken(
+    return new MfaManagerSendOtpActionToken(
         context.getUser().getId(),
         absoluteExpirationInSecs,
         clientId,
@@ -73,7 +89,8 @@ public class ExternalMfaAuthenticator implements Authenticator {
   }
 
   public String getApplicationId(AuthenticationFlowContext context) {
-    return context.getAuthenticatorConfig() != null ? context.getAuthenticatorConfig().getConfig().get(ExternalMfaAuthenticatorFactory.CONFIG_APPLICATION_ID) : DEFAULT_MFA_ID;
+    return context.getAuthenticatorConfig() != null ? context.getAuthenticatorConfig().getConfig().get(
+        MfaManagerValidateOtpAuthenticatorFactory.CONFIG_APPLICATION_ID) : DEFAULT_MFA_ID;
   }
 
   @Override

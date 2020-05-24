@@ -8,6 +8,9 @@
       <module name="org.keycloak.keycloak-services" export="true" />
       <module name="org.jboss.logging" export="true" />
     </dependencies>
+    <!-- see http://www.mastertheboss.com/jboss-server/jboss-deploy/practical-examples-of-jboss-deployment-structure-xml
+          and https://stackoverflow.com/questions/58203788/keycloak-custom-spi-does-not-appear-in-list
+    -->
     <!--
     <exclusions>
       <module name="org.jboss.resteasy.resteasy-jackson2-provider" />

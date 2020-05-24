@@ -48,7 +48,7 @@ mock/up:
 ## Test the mock service
 .PHONY: mock/test
 mock/test:
-	curl -s http://127.0.0.1:4010/user/c9f68d07-e7e1-4b3a-9821-2beab218d180  -H "accept: application/json" | jq .
+	curl -s http://127.0.0.1:4010/users/7aaddb11-1a6c-2e39-8de5-604cd4a14fef -H "accept: application/json" | jq .
 
 ## -- Docker --
 
@@ -118,15 +118,15 @@ mvn/deploy-providers: mvn/deploy-user-provider mvn/deploy-auth-provider
 debug:
 	docker-compose -f docker-compose-dev.yml up
 
-## Get a token
+## Show openid info page
 .PHONY: kc/info
 kc/info:
 	curl -v -k http://localhost:8080/auth/realms/demo/.well-known/openid-configuration  | jq '.'
 
-## Get a token
-.PHONY: kc/token
-kc/token:
-	curl -v -k --data "username=user&password=test&grant_type=password&client_id=demo-client&client_secret=8a899f1a-e391-4bbf-b29f-35f103fda84d" http://localhost:8080/auth/realms/demo/protocol/openid-connect/token | jq '.'
+## Get a token using password
+.PHONY: kc/login
+kc/login:
+	./test-direct-grant.sh
 
 ## -- Tools --
 

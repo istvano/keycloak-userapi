@@ -1,4 +1,4 @@
-package uk.co.urbanandco.keycloak.actiontoken.authenticator;
+package uk.co.urbanandco.keycloak.authentication.authenticators.directgrant;
 
 import static org.keycloak.provider.ProviderConfigProperty.STRING_TYPE;
 
@@ -16,9 +16,9 @@ import org.keycloak.provider.ProviderConfigurationBuilder;
 
 @JBossLog
 @AutoService(AuthenticatorFactory.class)
-public class ExternalMfaAuthenticatorFactory implements AuthenticatorFactory {
+public class MfaManagerValidateOtpAuthenticatorFactory implements AuthenticatorFactory {
 
-  public static final String ID = "external-mfa-authenticator";
+  public static final String ID = "mfa-man-direct-otp-authenticator";
   public static final String CONFIG_APPLICATION_ID = "mfa-id";
   private static final List<ProviderConfigProperty> CONFIG_META_DATA;
 
@@ -33,7 +33,7 @@ public class ExternalMfaAuthenticatorFactory implements AuthenticatorFactory {
         .name(CONFIG_APPLICATION_ID)
         .type(STRING_TYPE)
         .label("Mfa ID")
-        .defaultValue(ExternalMfaAuthenticator.DEFAULT_MFA_ID)
+        .defaultValue(MfaManagerValidateOtpAuthenticator.DEFAULT_MFA_ID)
         .helpText("External MFA ID sent in the token")
         .add()
         .build();
@@ -76,7 +76,7 @@ public class ExternalMfaAuthenticatorFactory implements AuthenticatorFactory {
 
   @Override
   public Authenticator create(KeycloakSession session) {
-    return new ExternalMfaAuthenticator();
+    return new MfaManagerValidateOtpAuthenticator();
   }
 
   @Override

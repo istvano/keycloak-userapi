@@ -141,7 +141,7 @@ paths:
                 firstName: 'Test'
                 lastName: 'User'
                 email: 'test@example.org'
-                phone: 'Phone number'
+                phone: '(900) 899-1295 x768'
                 userStatus: 1
         400:
           description: >
@@ -304,7 +304,7 @@ components:
           format: uuid
         username:
           type: string
-          x-faker: internet.userName
+          format: static
         firstName:
           type: string
           x-faker: name.firstName
@@ -330,7 +330,7 @@ components:
         phone: '01342 450950'
         id: 'c9f68d07-e7e1-4b3a-9821-2beab218d180'
         email: 'george32@example.com'
-        username: 'george32'
+        username: 'user'
       xml:
         name: User
     UserNameLookup:
