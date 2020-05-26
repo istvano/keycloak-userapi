@@ -9,6 +9,11 @@
     "auth": "",
     "ssl": ""
   },
+  "eventsEnabled": true,
+  "eventsListeners": [
+    "custom-events",
+    "jboss-logging"
+  ],
   "clients": [
     {
       "id": "1ff744f0-b5b2-4e5e-9b81-ded7722c50bc",
