@@ -4,6 +4,7 @@ import com.google.auto.service.AutoService;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import lombok.extern.jbosslog.JBossLog;
+import org.keycloak.Config.Scope;
 import org.keycloak.TokenVerifier.Predicate;
 import org.keycloak.authentication.actiontoken.AbstractActionTokenHander;
 import org.keycloak.authentication.actiontoken.ActionTokenContext;
@@ -11,7 +12,6 @@ import org.keycloak.authentication.actiontoken.ActionTokenHandlerFactory;
 import org.keycloak.common.util.Time;
 import org.keycloak.events.Errors;
 import org.keycloak.events.EventType;
-import org.keycloak.protocol.oidc.TokenManager;
 import org.keycloak.services.messages.Messages;
 import org.keycloak.sessions.AuthenticationSessionModel;
 import uk.co.urbanandco.keycloak.representations.MfaActionRepresentation;
@@ -21,6 +21,8 @@ import uk.co.urbanandco.keycloak.representations.MfaActionRepresentation;
 public class MfaManagerSendOtpActionTokenHandler extends
     AbstractActionTokenHander<MfaManagerSendOtpActionToken> {
 
+  private String apiUrl;
+
   public MfaManagerSendOtpActionTokenHandler() {
     super(
         MfaManagerSendOtpActionToken.TOKEN_TYPE,
@@ -29,6 +31,14 @@ public class MfaManagerSendOtpActionTokenHandler extends
         EventType.EXECUTE_ACTION_TOKEN,
         Errors.INVALID_REQUEST
     );
+  }
+
+  @Override
+  public void init(Scope config) {
+    // this configuration is pulled from the SPI configuration of this provider in the standalone[-ha] / domain.xml
+    // see develop.cli
+    apiUrl = config.get("connectionUrl");
+    log.infov("Configured {0} with connectionUrl: {1}", this, apiUrl);
   }
 
   @Override
