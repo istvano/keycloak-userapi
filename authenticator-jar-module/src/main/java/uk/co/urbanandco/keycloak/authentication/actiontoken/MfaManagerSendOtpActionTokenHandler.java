@@ -46,6 +46,7 @@ public class MfaManagerSendOtpActionTokenHandler extends
       ActionTokenContext<MfaManagerSendOtpActionToken> tokenContext) {
 
     //TODO send the request to the mfa service to send a one time password to the user
+    // We need to send a request to an API to send a OTP to the customer / user
     MfaActionRepresentation rep = new MfaActionRepresentation(generateVerificationToken(tokenContext, token.getUserId(), token.getApplicationId()));
     return Response.ok(rep, MediaType.APPLICATION_JSON_TYPE).build();
   }
