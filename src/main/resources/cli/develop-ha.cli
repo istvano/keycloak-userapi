@@ -7,9 +7,5 @@ embed-server --std-out=echo --server-config=standalone-ha.xml --admin-only
 /subsystem=keycloak-server/theme=defaults/:write-attribute(name=cacheThemes,value=${env.KEYCLOAK_THEME_CACHE:true})
 /subsystem=keycloak-server/theme=defaults/:write-attribute(name=cacheTemplates,value=${env.KEYCLOAK_THEME_CACHE:true})
 /subsystem=keycloak-server/theme=defaults/:write-attribute(name=staticMaxAge,value=${env.KEYCLOAK_STATIC_MAX_AGE:2592000})
-# pass apiUrl to the actionTokenFactory
-/subsystem=keycloak-server/spi=actionTokenHandler:add()
-/subsystem=keycloak-server/spi=actionTokenHandler/provider=mfa-man-send:add(enabled=true)
-/subsystem=keycloak-server/spi=actionTokenHandler/provider=mfa-man-send:write-attribute(name=properties.connectionUrl,value=${env.REST_API_ENDPOINT})
 stop-embedded-server
 echo SETUP: END Keycloak logging configuration...

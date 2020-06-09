@@ -90,28 +90,10 @@ mvn/install:
 mvn/install-user-provider:
 	(cd ./user-provider-jar-module && mvn clean install -DskipTests)
 
-## Build authenticator providers only
-.PHONY: mvn/install-auth-provider
-mvn/install-auth-provider:
-	(cd ./authenticator-jar-module && mvn clean install -DskipTests)
-
-## Build all the providers
-.PHONY: mvn/install-providers
-mvn/install-providers: mvn/install-user-provider mvn/install-auth-provider
-
 ## Deploy user storage providers only
 .PHONY: mvn/deploy-user-provider
 mvn/deploy-user-provider:
 	(cd ./user-provider-ear-module && mvn clean wildfly:deploy -Dwildfly.username=keycloak -Dwildfly.password=keycloak)
-
-## Deploy authenticator providers only
-.PHONY: mvn/deploy-auth-provider
-mvn/deploy-auth-provider:
-	(cd ./authenticator-ear-module && mvn clean wildfly:deploy -Dwildfly.username=keycloak -Dwildfly.password=keycloak)
-
-## Deploy all the providers
-.PHONY: mvn/deploy-providers
-mvn/deploy-providers: mvn/deploy-user-provider mvn/deploy-auth-provider
 
 ## Start Keycloak and the API only
 .PHONY: debug
@@ -126,7 +108,7 @@ kc/info:
 ## Get a token using password
 .PHONY: kc/login
 kc/login:
-	./test-direct-grant.sh
+	curl -s -k --data 'username=alice&password=password&grant_type=password&client_id=demo-client&client_secret=8a899f1a-e391-4bbf-b29f-35f103fda84d' http://localhost:8080/auth/realms/demo/protocol/openid-connect/token |  jq
 
 ## -- Tools --
 

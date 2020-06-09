@@ -11,7 +11,6 @@
   },
   "eventsEnabled": true,
   "eventsListeners": [
-    "custom-events",
     "jboss-logging"
   ],
   "clients": [
@@ -764,94 +763,6 @@
       "topLevel": true,
       "builtIn": false,
       "authenticationExecutions": []
-    },
-    {
-      "id": "ff036a21-168a-4bd7-9260-d32d04369f23",
-      "alias": "custom direct grant",
-      "description": "OpenID Connect Resource Owner Grant",
-      "providerId": "basic-flow",
-      "topLevel": true,
-      "builtIn": false,
-      "authenticationExecutions": [
-        {
-          "authenticator": "action-token-direct-username",
-          "requirement": "REQUIRED",
-          "priority": 10,
-          "userSetupAllowed": false,
-          "autheticatorFlow": false
-        },
-        {
-          "requirement": "CONDITIONAL",
-          "priority": 20,
-          "flowAlias": "custom direct grant Direct Grant - Conditional Password",
-          "userSetupAllowed": false,
-          "autheticatorFlow": true
-        },
-        {
-          "requirement": "CONDITIONAL",
-          "priority": 30,
-          "flowAlias": "custom direct grant Direct Grant - Conditional OTP",
-          "userSetupAllowed": false,
-          "autheticatorFlow": true
-        }
-      ]
-    },
-    {
-      "id": "a56db651-eff2-4123-af23-25bb43712e82",
-      "alias": "custom direct grant Direct Grant - Conditional Password",
-      "description": "Flow to determine if the password validation is required for the authentication",
-      "providerId": "basic-flow",
-      "topLevel": false,
-      "builtIn": false,
-      "authenticationExecutions": [
-        {
-          "authenticator": "conditional-user-configured",
-          "requirement": "REQUIRED",
-          "priority": 10,
-          "userSetupAllowed": false,
-          "autheticatorFlow": false
-        },
-        {
-          "authenticatorConfig": "conditional-password-check-config",
-          "authenticator": "conditional-auth-note",
-          "requirement": "REQUIRED",
-          "priority": 20,
-          "userSetupAllowed": false,
-          "autheticatorFlow": false
-        },
-        {
-          "authenticator": "direct-grant-validate-password",
-          "requirement": "REQUIRED",
-          "priority": 30,
-          "userSetupAllowed": false,
-          "autheticatorFlow": false
-        }
-      ]
-    },
-    {
-      "id": "a56db651-eff2-4123-af23-25bb43712e82",
-      "alias": "custom direct grant Direct Grant - Conditional OTP",
-      "description": "Flow to determine if the OTP is required for the authentication",
-      "providerId": "basic-flow",
-      "topLevel": false,
-      "builtIn": false,
-      "authenticationExecutions": [
-        {
-          "authenticator": "conditional-user-configured",
-          "requirement": "REQUIRED",
-          "priority": 10,
-          "userSetupAllowed": false,
-          "autheticatorFlow": false
-        },
-        {
-          "authenticatorConfig": "external-mfa-config",
-          "authenticator": "mfa-man-direct-otp-authenticator",
-          "requirement": "REQUIRED",
-          "priority": 20,
-          "userSetupAllowed": false,
-          "autheticatorFlow": false
-        }
-      ]
     }
   ],
   "authenticatorConfig": [
@@ -868,25 +779,11 @@
       "config": {
         "update.profile.on.first.login": "missing"
       }
-    },
-    {
-      "id": "75b62681-5473-42d0-850f-33a6b3703fb0",
-      "alias": "external-mfa-config",
-      "config": {
-        "mfa-id": "ext-mfa"
-      }
-    },
-    {
-      "id": "1b1ef605-b8fe-4ed9-809e-e3dd80602504",
-      "alias": "conditional-password-check-config",
-      "config": {
-        "auth-note": "INITIATED_BY_ACTION_TOKEN_MFA"
-      }
     }
   ],
   "browserFlow": "browser",
   "registrationFlow": "void",
-  "directGrantFlow": "custom direct grant",
+  "directGrantFlow": "direct grant",
   "resetCredentialsFlow": "void",
   "dockerAuthenticationFlow": "void",
   "keycloakVersion": "10.0.1"
