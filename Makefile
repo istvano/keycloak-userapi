@@ -54,13 +54,13 @@ mock/test:
 
 ## Start full stack with MySql
 .PHONY: stack/up
-up:
+stack/up:
 	docker-compose up
 
 ## SSH into keycloak container
 .PHONY: stack/ssh-kc
 stack/ssh-kc:
-	docker-compose exec keycloak -it bash
+	docker-compose exec keycloak bash
 
 ## -- Development --
 

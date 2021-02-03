@@ -15,7 +15,7 @@ services:
       - 4010:4010
 
   keycloak:
-    image: urbanandco/keycloak-training:10.0.1
+    image: urbanandco/keycloak-training:11.0.3
     environment:
       KEYCLOAK_USER: admin
       KEYCLOAK_PASSWORD: admin
@@ -42,4 +42,4 @@ services:
     image: djfarrelly/maildev:1.1.0
     ports:
     - "8081:80"
-    - "25"      
+    - "25"

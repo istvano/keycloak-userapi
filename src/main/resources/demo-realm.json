@@ -786,5 +786,5 @@
   "directGrantFlow": "direct grant",
   "resetCredentialsFlow": "void",
   "dockerAuthenticationFlow": "void",
-  "keycloakVersion": "10.0.1"
+  "keycloakVersion": "11.0.3"
 }

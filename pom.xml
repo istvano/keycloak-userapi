@@ -6,7 +6,7 @@
 
     <groupId>uk.co.urbanandco.keycloak</groupId>
     <artifactId>thirdparty-userapi</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <modules>
@@ -24,11 +24,11 @@
 
         <lombok.version>1.18.12</lombok.version>
         <jboss-logging.version>3.3.1.Final</jboss-logging.version>
-        <keycloak.version>10.0.1</keycloak.version>
+        <keycloak.version>11.0.3</keycloak.version>
         <auto-service.version>1.0-rc5</auto-service.version>
         <jboss.home>target/keycloak</jboss.home>
 
-        <openapi.codegen.version>5.0.0-SNAPSHOT</openapi.codegen.version>
+        <openapi.codegen.version>5.0.0</openapi.codegen.version>
 
         <!-- open api -->
         <swagger-annotations-version>1.5.24</swagger-annotations-version>
@@ -37,10 +37,9 @@
         <jackson-version>2.10.3</jackson-version>
         <jackson-databind-nullable-version>0.2.1</jackson-databind-nullable-version>
         <jackson-databind-version>2.10.3</jackson-databind-version>
-        <junit-version>4.13</junit-version>
+        <junit-version>4.13.1</junit-version>
         <maven-plugin-version>1.0.0</maven-plugin-version>
         <oltu-version>1.0.1</oltu-version>
-
     </properties>
 
     <dependencyManagement>
